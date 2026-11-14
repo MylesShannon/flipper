@@ -9,17 +9,7 @@ cd "$HERE"
 VERSION=$(cat VERSION)
 STAGE="$HERE/build/Flipper.app"
 
-# FLIPPER_SIGN names a command that signs a release build; it's called with the app's path and bundle ID.
-if [ -n "${FLIPPER_SIGN:-}" ]; then
-  sign() { $FLIPPER_SIGN "$STAGE" com.mylesshannon.flipper; }
-else
-  sign() {
-    codesign --force --sign - --identifier com.mylesshannon.flipper "$STAGE"
-    echo "Signed ad hoc, so macOS asks for Accessibility again after each rebuild."
-  }
-fi
-
-echo "Building Flipper..."
+echo "Building Flipper $VERSION..."
 mkdir -p .build
 if ! swift build -c release --product Flipper -Xswiftc -file-prefix-map -Xswiftc "$HERE=." > .build/swift-build.log 2>&1; then
   tail -n 30 .build/swift-build.log >&2
@@ -41,6 +31,12 @@ if ! xcrun actool Resources/AppIcon.icon --compile "$STAGE/Contents/Resources" -
   exit 1
 fi
 
-sign
-
-echo "Built build/Flipper.app."
+# FLIPPER_SIGN names a command that signs a release build; it's called with the app's path and bundle ID.
+if [ -n "${FLIPPER_SIGN:-}" ]; then
+  case $FLIPPER_SIGN in sudo\ *) echo "Signing needs your password." ;; esac
+  $FLIPPER_SIGN "$STAGE" com.mylesshannon.flipper
+  echo "Built and signed build/Flipper.app."
+else
+  codesign --force --sign - --identifier com.mylesshannon.flipper "$STAGE"
+  echo "Built build/Flipper.app, signed ad hoc, so macOS asks for its permissions again after each rebuild."
+fi

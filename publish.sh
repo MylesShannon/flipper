@@ -39,7 +39,7 @@ if codesign -dv "$APP" 2>&1 | grep -q 'Signature=adhoc'; then
   exit 1
 fi
 
-echo "Notarizing Flipper with Apple..."
+echo "Notarizing Flipper $VERSION with Apple..."
 ditto -c -k --keepParent "$APP" "$work/notarize.zip"
 out=$(xcrun notarytool submit "$work/notarize.zip" --keychain-profile "$NOTARY_PROFILE" --wait --output-format json) || {
   echo "Notarizing didn't finish. If notarytool has no saved login yet, add one with: xcrun notarytool store-credentials $NOTARY_PROFILE" >&2
