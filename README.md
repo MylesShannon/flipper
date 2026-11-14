@@ -8,7 +8,6 @@
 
 <p align="center">
   <a href="https://github.com/MylesShannon/flipper/releases/latest">Download</a> ·
-  <a href="https://mylesshannon.github.io/flipper/">Website</a> ·
   <a href="#faq">FAQ</a> ·
   <a href="docs/development.md">Build from source</a>
 </p>
