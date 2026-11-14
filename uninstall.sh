@@ -10,6 +10,8 @@ case "${1:-}" in
   --permissions-only) mode=permissions ;;
   *) echo "Usage: ./uninstall.sh [--delete-settings | --permissions-only]" >&2; exit 2 ;;
 esac
+HERE=$(cd "$(dirname "$0")" && pwd)
+cd "$HERE"
 
 if [ "$mode" != permissions ] && [ -x "$INSTALLED/Contents/MacOS/Flipper" ]; then
   "$INSTALLED/Contents/MacOS/Flipper" unregister
