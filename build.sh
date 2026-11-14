@@ -24,11 +24,11 @@ cp "$(swift build -c release --show-bin-path)/Flipper" "$STAGE/Contents/MacOS/Fl
 strip -S -x "$STAGE/Contents/MacOS/Flipper"
 sed "s/__VERSION__/$VERSION/g" Info.plist > "$STAGE/Contents/Info.plist"
 # The Icon Composer icon compiles to Assets.car, which current macOS draws as a modern icon, plus AppIcon.icns for older ones.
-if ! xcrun actool Resources/AppIcon.icon --compile "$STAGE/Contents/Resources" --app-icon AppIcon --platform macosx \
-  --minimum-deployment-target 15.0 --output-partial-info-plist .build/icon-partial.plist > .build/actool.log 2>&1 ||
+if ! xcrun actool "$HERE/Resources/AppIcon.icon" --compile "$STAGE/Contents/Resources" --app-icon AppIcon --platform macosx \
+  --minimum-deployment-target 15.0 --output-partial-info-plist "$HERE/.build/icon-partial.plist" > .build/actool.log 2>&1 ||
   [ ! -f "$STAGE/Contents/Resources/Assets.car" ]; then
   tail -n 30 .build/actool.log >&2
-  echo "Compiling Flipper's icon with actool failed." >&2
+  echo "Building the icon failed, so Flipper wasn't built." >&2
   exit 1
 fi
 
