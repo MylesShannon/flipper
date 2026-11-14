@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eu
-
-[ "$(id -u)" != 0 ] || { echo "Run as yourself, not with sudo: ./build.sh"; exit 1; }
-[ $# = 0 ] || { echo "Usage: ./build.sh"; exit 2; }
+trap 'echo "build.sh stopped at line $LINENO. The output above says why." >&2' ERR
+[ "$(id -u)" != 0 ] || { echo "Run as yourself, not with sudo: ./build.sh" >&2; exit 1; }
+[ $# = 0 ] || { echo "Usage: ./build.sh" >&2; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE"
 
@@ -22,8 +22,8 @@ fi
 echo "Building Flipper..."
 mkdir -p .build
 if ! swift build -c release --product Flipper -Xswiftc -file-prefix-map -Xswiftc "$HERE=." > .build/swift-build.log 2>&1; then
-  tail -n 30 .build/swift-build.log
-  echo "Building Flipper failed."
+  tail -n 30 .build/swift-build.log >&2
+  echo "Building Flipper failed." >&2
   exit 1
 fi
 

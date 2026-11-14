@@ -1,9 +1,7 @@
 #!/bin/bash
 set -eu
-
-[ "$(id -u)" != 0 ] || { echo "Run as yourself, not with sudo: ./uninstall.sh"; exit 1; }
-LABEL=com.mylesshannon.flipper
-INSTALLED="/Applications/Flipper.app"
+trap 'echo "uninstall.sh stopped at line $LINENO. The output above says why." >&2' ERR
+[ "$(id -u)" != 0 ] || { echo "Run as yourself, not with sudo: ./uninstall.sh" >&2; exit 1; }
 case "${1:-}" in
   "") mode=uninstall ;;
   --delete-settings) mode=everything ;;
@@ -12,6 +10,9 @@ case "${1:-}" in
 esac
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE"
+
+LABEL=com.mylesshannon.flipper
+INSTALLED="/Applications/Flipper.app"
 
 if [ "$mode" != permissions ] && [ -x "$INSTALLED/Contents/MacOS/Flipper" ]; then
   "$INSTALLED/Contents/MacOS/Flipper" unregister
