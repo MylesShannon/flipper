@@ -25,7 +25,7 @@ done
 
 # Accessibility is in the system's permissions database, so it asks for your password. tccutil finds the app by its
 # bundle identifier, so this runs before the app is removed.
-echo "Uninstalling needs your password."
+if [ "$mode" = permissions ]; then echo "Resetting Flipper's permissions needs your password."; else echo "Uninstalling needs your password."; fi
 sudo tccutil reset Accessibility "$LABEL" >/dev/null
 if [ "$mode" = permissions ]; then
   open "$INSTALLED"
