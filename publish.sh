@@ -1,0 +1,68 @@
+#!/bin/bash
+set -eu
+
+[ "$(id -u)" != 0 ] || { echo "Run as yourself, not with sudo: ./publish.sh <notes.md>"; exit 1; }
+[ $# = 1 ] || { echo "Usage: ./publish.sh <notes.md>"; exit 2; }
+[ -f "$1" ] || { echo "$1 isn't a file."; exit 1; }
+NOTES="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+HERE=$(cd "$(dirname "$0")" && pwd)
+cd "$HERE"
+
+NOTARY_PROFILE=${NOTARY_PROFILE:-notary}
+
+[ -n "${FLIPPER_SIGN:-}" ] || { echo "Set FLIPPER_SIGN to the command that signs release builds. See docs/development.md."; exit 1; }
+gh auth status >/dev/null 2>&1 || { echo "Sign in to GitHub first: gh auth login"; exit 1; }
+[ "$(git branch --show-current)" = main ] || { echo "Switch to main first."; exit 1; }
+[ -z "$(git status --porcelain)" ] || { echo "Commit or remove your changes first. Keep the notes outside the repo or in build/."; exit 1; }
+
+VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Info.plist)
+TAG="v$VERSION"
+NAME="Flipper-$VERSION"
+
+git fetch --quiet origin main
+[ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || { echo "Push main first, so the release matches GitHub."; exit 1; }
+if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+  echo "$TAG is already on GitHub. Raise CFBundleShortVersionString in Info.plist for a new release."
+  exit 1
+fi
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+./build.sh
+
+APP="$work/$NAME/Flipper.app"
+mkdir "$work/$NAME"
+ditto "build/Flipper.app" "$APP"
+if codesign -dv "$APP" 2>&1 | grep -q 'Signature=adhoc'; then
+  echo "build/Flipper.app is signed ad hoc, which Apple won't notarize. Check FLIPPER_SIGN."
+  exit 1
+fi
+
+echo "Notarizing Flipper with Apple..."
+ditto -c -k --keepParent "$APP" "$work/notarize.zip"
+out=$(xcrun notarytool submit "$work/notarize.zip" --keychain-profile "$NOTARY_PROFILE" --wait --output-format json) || {
+  echo "Notarizing didn't finish. If notarytool has no saved login yet, add one with: xcrun notarytool store-credentials $NOTARY_PROFILE"
+  exit 1
+}
+[ "$(jq -r .status <<<"$out")" = Accepted ] || {
+  echo "Apple didn't accept Flipper. See why with: xcrun notarytool log $(jq -r .id <<<"$out") --keychain-profile $NOTARY_PROFILE"
+  exit 1
+}
+xcrun stapler staple -q "$APP"
+spctl --assess --type execute "$APP"
+
+cp install.sh uninstall.sh "$work/$NAME/"
+ZIP="$HERE/build/$NAME.zip"
+rm -f "$ZIP"
+(cd "$work" && ditto -c -k --keepParent "$NAME" "$ZIP")
+
+git tag -a "$TAG" -m "Flipper $VERSION"
+git push --quiet origin "$TAG"
+
+echo "Creating the $TAG release..."
+if ! gh release create "$TAG" "$ZIP" --verify-tag --title "Flipper $VERSION" --notes-file "$NOTES" --latest; then
+  echo "$TAG is pushed but the release wasn't made. Make it from that tag on GitHub and upload build/$NAME.zip."
+  exit 1
+fi
+echo "Published Flipper $VERSION."

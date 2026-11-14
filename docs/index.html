@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flipper: reverse mouse scrolling on Mac, separately from the trackpad</title>
+<meta name="description" content="Free, open-source macOS menu bar app that reverses the scroll direction of your mouse and trackpad separately. Keep natural scrolling on the trackpad and a normal mouse wheel.">
+<link rel="canonical" href="https://mylesshannon.github.io/flipper/">
+<meta name="google-site-verification" content="t6HXDPfI81EdrNApduGf0XaV6OBkaaSHuFomydauTiQ">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Flipper">
+<meta property="og:title" content="Flipper: reverse mouse scrolling on Mac">
+<meta property="og:description" content="Free, open-source macOS menu bar app that sets the scroll direction of your mouse and trackpad separately.">
+<meta property="og:url" content="https://mylesshannon.github.io/flipper/">
+<meta property="og:image" content="https://mylesshannon.github.io/flipper/icon.png">
+<meta property="og:image:width" content="256">
+<meta property="og:image:height" content="256">
+<meta property="og:image:alt" content="The Flipper app icon">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	"name": "Flipper",
+	"description": "A macOS menu bar app that reverses the scroll direction of a mouse and a trackpad separately, so natural scrolling can stay on for the trackpad while the mouse wheel scrolls the traditional way.",
+	"url": "https://mylesshannon.github.io/flipper/",
+	"downloadUrl": "https://github.com/MylesShannon/flipper/releases/latest",
+	"image": "https://mylesshannon.github.io/flipper/icon.png",
+	"applicationCategory": "UtilitiesApplication",
+	"operatingSystem": "macOS 14 or later",
+	"license": "https://opensource.org/licenses/MIT",
+	"isAccessibleForFree": true,
+	"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+	"author": { "@type": "Person", "name": "Myles Shannon" }
+}
+</script>
+<style>
+	:root { color-scheme: light dark; }
+	body {
+		margin: 0 auto;
+		padding: 4rem 1.5rem;
+		max-width: 34rem;
+		font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+		text-align: center;
+	}
+	img { width: 128px; height: 128px; }
+	h1 { margin: 1rem 0 0.25rem; font-size: 2rem; }
+	h2 { margin: 2.5rem 0 0.5rem; font-size: 1.25rem; text-align: left; }
+	p.tagline { margin: 0 0 2rem; opacity: 0.7; text-align: center; text-wrap: balance; }
+	p, ul { text-align: left; }
+	nav { margin: 2rem 0; display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap; }
+	footer { margin-top: 3rem; font-size: 0.85rem; opacity: 0.6; }
+</style>
+</head>
+<body>
+	<header>
+		<img src="icon.png" alt="Flipper app icon" width="128" height="128">
+		<h1>Flipper</h1>
+		<p class="tagline">Reverse mouse scrolling on Mac, without touching your trackpad.</p>
+	</header>
+
+	<main>
+		<p>
+			Flipper is a menu bar app that sets the scroll direction of a mouse and a trackpad
+			separately. Keep natural scrolling on your MacBook trackpad and have a normal scroll wheel
+			on your mouse, or the other way round. It's free and open source.
+		</p>
+		<p>
+			macOS has a single Natural scrolling setting for every device, so turning it on makes the
+			mouse wheel scroll backwards and turning it off does the same to the trackpad. Flipper
+			leaves that setting alone and reverses only the device you pick.
+		</p>
+
+		<nav>
+			<a href="https://github.com/MylesShannon/flipper/releases/latest">Download for macOS</a>
+			<a href="https://github.com/MylesShannon/flipper">Source on GitHub</a>
+			<a href="https://github.com/MylesShannon/flipper#faq">FAQ</a>
+		</nav>
+
+		<h2>What it does</h2>
+		<ul>
+			<li>Reverse mouse scroll direction, trackpad scroll direction, or both.</li>
+			<li>Reverse vertical and horizontal scrolling, each on or off.</li>
+			<li>Takes effect straight away, with no restart or log out.</li>
+			<li>Treats a Magic Mouse like a trackpad, since it scrolls smoothly the same way.</li>
+			<li>No network access, no analytics, no dependencies. About 400 lines of Swift.</li>
+		</ul>
+
+		<h2>Install</h2>
+		<p>
+			Flipper needs macOS 14 Sonoma or later, on Apple silicon or Intel. It's notarized by Apple,
+			so it opens like any other app. Download the zip, unzip it and open Flipper.app. It offers
+			to move itself to Applications, adds itself to Open at Login, and asks for Accessibility,
+			which macOS requires before an app can change scroll events.
+		</p>
+	</main>
+
+	<footer>
+		MIT licensed. A personal project, not connected to any employer.
+	</footer>
+</body>
+</html>
