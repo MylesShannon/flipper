@@ -6,6 +6,7 @@ set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE"
 
+VERSION=$(cat VERSION)
 STAGE="$HERE/build/Flipper.app"
 
 # FLIPPER_SIGN names a command that signs a release build; it's called with the app's path and bundle ID.
@@ -31,7 +32,7 @@ mkdir -p "$STAGE/Contents/MacOS" "$STAGE/Contents/Resources"
 cp "$(swift build -c release --show-bin-path)/Flipper" "$STAGE/Contents/MacOS/Flipper"
 # Without this, the binary keeps the paths of the folder it was built in.
 strip -S -x "$STAGE/Contents/MacOS/Flipper"
-cp Info.plist "$STAGE/Contents/"
+sed "s/__VERSION__/$VERSION/g" Info.plist > "$STAGE/Contents/Info.plist"
 # The Icon Composer icon compiles to Assets.car, which current macOS draws as a modern icon, plus AppIcon.icns for older ones.
 xcrun actool Resources/AppIcon.icon --compile "$STAGE/Contents/Resources" --app-icon AppIcon --platform macosx \
   --minimum-deployment-target 14.0 --output-partial-info-plist .build/icon-partial.plist >/dev/null

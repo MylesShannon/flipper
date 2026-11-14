@@ -52,7 +52,10 @@ Each release has `Flipper-<version>.zip`: a folder holding the signed, notarized
 and stapled app with `install.sh` and `uninstall.sh`, zipped with
 `ditto -c -k --keepParent`.
 
-To publish, raise `CFBundleShortVersionString` in `Info.plist`, push main, write
+The version is in `VERSION`, and `build.sh` writes it into both
+`CFBundleShortVersionString` and `CFBundleVersion` of the app it builds.
+
+To publish, raise `VERSION`, push main, write
 the notes in a file outside the repo (or in `build/`), and run `./publish.sh
 notes.md` with `FLIPPER_SIGN` set and the GitHub CLI signed in. It stops unless
 main is clean and pushed and `v<version>` is a new tag. Then it builds, has Apple

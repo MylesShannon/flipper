@@ -15,14 +15,14 @@ gh auth status >/dev/null 2>&1 || { echo "Sign in to GitHub first: gh auth login
 [ "$(git branch --show-current)" = main ] || { echo "Switch to main first."; exit 1; }
 [ -z "$(git status --porcelain)" ] || { echo "Commit or remove your changes first. Keep the notes outside the repo or in build/."; exit 1; }
 
-VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Info.plist)
+VERSION=$(cat VERSION)
 TAG="v$VERSION"
 NAME="Flipper-$VERSION"
 
 git fetch --quiet origin main
 [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || { echo "Push main first, so the release matches GitHub."; exit 1; }
 if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
-  echo "$TAG is already on GitHub. Raise CFBundleShortVersionString in Info.plist for a new release."
+  echo "$TAG is already on GitHub. Raise VERSION for a new release."
   exit 1
 fi
 
