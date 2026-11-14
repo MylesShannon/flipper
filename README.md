@@ -32,8 +32,8 @@ pick.
 - Takes effect straight away, with no restart or log out.
 - Notarized by Apple, so it opens like any other app.
 - No network access, no analytics, no dependencies. About 400 lines of Swift.
-- Works on Apple silicon and Intel Macs running macOS 14 Sonoma, macOS 15
-  Sequoia, macOS 26 Tahoe or later.
+- Works on Apple silicon and Intel Macs running macOS 15 Sequoia or later,
+  including macOS 26 Tahoe.
 
 ## Install
 

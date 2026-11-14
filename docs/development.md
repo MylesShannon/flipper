@@ -1,6 +1,7 @@
 # Development
 
-Needs a Mac with Xcode, for `swift` and the icon compiler `actool`.
+Needs a Mac running macOS 15 or later with Xcode, for `swift` and the icon compiler
+`actool`.
 
 | Command                          | Result                                                      |
 | -------------------------------- | ----------------------------------------------------------- |

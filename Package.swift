@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Flipper",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v15)],
     targets: [
         .target(name: "FlipperCore"),
         .executableTarget(name: "Flipper", dependencies: ["FlipperCore"]),
