@@ -40,6 +40,12 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         refreshIcon()
     }
 
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        // Opens the menu after the reopen event is answered, since an open menu blocks until it closes.
+        DispatchQueue.main.async { self.item.button?.performClick(nil) }
+        return false
+    }
+
     func menuNeedsUpdate(_ menu: NSMenu) {
         let s = scrollTap.settings
         menu.removeAllItems()

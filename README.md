@@ -58,7 +58,8 @@ To build it yourself instead, see [Development](docs/development.md).
 
 ## Using it
 
-Click the arrows in the menu bar.
+Click the arrows in the menu bar. Opening Flipper again while it runs, from
+Applications or Spotlight, opens the same menu.
 
 - **Flip: Mouse** reverses the scroll wheel of a mouse.
 - **Flip: Trackpad** reverses a trackpad or Magic Mouse.
