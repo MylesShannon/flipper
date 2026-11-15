@@ -86,9 +86,7 @@ publishes, made once with Sparkle's `generate_keys --account flipper`. After a
 build has downloaded Sparkle, that's
 `.build/artifacts/sparkle/Sparkle/bin/generate_keys --account flipper`, which
 prints the public key for `SUPublicEDKey`. **Back it up.** Without it no future
-release can be signed, and installs already out there have no way to update. Until
-`Info.plist` has the key instead of `__SPARKLE_PUBLIC_KEY__`, `build.sh` refuses to
-make a signed build, and Sparkle in an ad hoc build reports that it can't start.
+release can be signed, and installs already out there have no way to update.
 
 `publish.sh` exports the key with `generate_keys -x` into its temporary folder and
 passes it to `generate_appcast` with `--ed-key-file`, because over SSH

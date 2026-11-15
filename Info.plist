@@ -14,7 +14,7 @@
   <key>LSMinimumSystemVersion</key><string>15.0</string>
   <key>LSUIElement</key><true/>
   <key>SUFeedURL</key><string>https://mylesshannon.github.io/flipper/appcast.xml</string>
-  <key>SUPublicEDKey</key><string>__SPARKLE_PUBLIC_KEY__</string>
+  <key>SUPublicEDKey</key><string>PreXsHYLxedkRNmjkxtDRVTng0c2fZmE3CzxmeENT3M=</string>
   <key>SUEnableAutomaticChecks</key><true/>
 </dict>
 </plist>

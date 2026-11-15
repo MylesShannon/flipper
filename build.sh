@@ -11,12 +11,6 @@ VERSION=$(cat VERSION)
 STAGE="$HERE/build/Flipper.app"
 FRAMEWORK="$STAGE/Contents/Frameworks/Sparkle.framework"
 
-if [ -n "${FLIPPER_SIGN:-}" ] && grep -q __SPARKLE_PUBLIC_KEY__ Info.plist; then
-  echo "Info.plist has no Sparkle public key yet, so a signed Flipper couldn't install updates." >&2
-  echo "Make the key with Sparkle's generate_keys --account flipper and put the public key it prints in SUPublicEDKey. See docs/development.md." >&2
-  exit 1
-fi
-
 # FLIPPER_SIGN names a command that signs a release build; it's called with a path, its identifier, and for code that
 # needs them, --entitlements and a file. Without it, builds are signed ad hoc, and without the hardened runtime, whose
 # library validation would refuse Sparkle for having a different Team ID than an ad hoc app's none.
