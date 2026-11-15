@@ -33,20 +33,25 @@ fi
 echo "Building Flipper $VERSION..."
 mkdir -p .build
 rm -f .build/install_name_tool.log
-if ! swift build -c release --product Flipper -Xswiftc -file-prefix-map -Xswiftc "$HERE=." > .build/swift-build.log 2>&1; then
-  tail -n 30 .build/swift-build.log >&2
-  echo "Building Flipper failed." >&2
-  exit 1
-fi
-BIN=$(swift build -c release --show-bin-path)
+slice() {
+  if ! swift build -c release --arch "$1" --scratch-path ".build-$1" --product Flipper \
+    -Xswiftc -file-prefix-map -Xswiftc "$HERE=." > .build/swift-build.log 2>&1; then
+    tail -n 30 .build/swift-build.log >&2
+    echo "Building Flipper failed." >&2
+    exit 1
+  fi
+  swift build -c release --arch "$1" --scratch-path ".build-$1" --show-bin-path
+}
+ARM=$(slice arm64)
+INTEL=$(slice x86_64)
 
 rm -rf "$STAGE"
 mkdir -p "$STAGE/Contents/MacOS" "$STAGE/Contents/Resources" "$STAGE/Contents/Frameworks"
-cp "$BIN/Flipper" "$STAGE/Contents/MacOS/Flipper"
+lipo -create -output "$STAGE/Contents/MacOS/Flipper" "$ARM/Flipper" "$INTEL/Flipper"
 # Without this, the binary keeps the paths of the folder it was built in.
 strip -S -x "$STAGE/Contents/MacOS/Flipper"
 # SwiftPM links Sparkle as @rpath, and the binary's own rpaths don't include Contents/Frameworks.
-cp -R "$BIN/Sparkle.framework" "$STAGE/Contents/Frameworks/"
+cp -R "$ARM/Sparkle.framework" "$STAGE/Contents/Frameworks/"
 if ! install_name_tool -add_rpath "@executable_path/../Frameworks" "$STAGE/Contents/MacOS/Flipper" > .build/install_name_tool.log 2>&1; then
   tail -n 30 .build/install_name_tool.log >&2
   echo "Adding the Frameworks folder to Flipper's search path failed, so Flipper wasn't built." >&2
