@@ -1,11 +1,13 @@
 import AppKit
 import FlipperCore
+import Sparkle
 
 final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let defaults = UserDefaults.standard
     private lazy var scrollTap = ScrollTap(settings: FlipSettings(defaults: defaults))
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private var waitForAccess: Timer?
+    private var updater: SPUStandardUpdaterController?
     // As wide as the column macOS draws the checkmark in, so the column stays when nothing is checked.
     private static let blankCheck = NSImage(size: NSSize(width: 12, height: 1), flipped: false) { _ in true }
 
@@ -16,6 +18,16 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         item.menu = menu
         if !Setup.isInApplications && Setup.offerMove() { return }
         Setup.registerLoginItemOnce(defaults)
+        if Setup.isInApplications {
+            let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+            self.updater = updater
+            // Sparkle's daily schedule counts from its last check, so a copy that was closed for a while would wait
+            // another day. Nothing appears unless there's a newer version.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                guard updater.updater.automaticallyChecksForUpdates, updater.updater.canCheckForUpdates else { return }
+                updater.updater.checkForUpdatesInBackground()
+            }
+        }
         if !scrollTap.start() {
             // Adds Flipper to the Accessibility list, switched off, and offers to open it.
             AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary)
@@ -54,6 +66,16 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } else {
             menu.addItem(action("Move to Applications…", #selector(move)))
         }
+        if let updater {
+            menu.addItem(.separator())
+            let check = action("Check for Updates…", #selector(SPUStandardUpdaterController.checkForUpdates(_:)))
+            check.target = updater
+            menu.addItem(check)
+            let automatic = action("Check for Updates Automatically", #selector(toggleAutomaticUpdates))
+            automatic.subtitle = "Flipper asks before installing anything."
+            automatic.state = updater.updater.automaticallyChecksForUpdates ? .on : .off
+            menu.addItem(automatic)
+        }
         menu.addItem(.separator())
         // Its own action rather than terminate(_:), which macOS 26 gives an icon that shifts the rows around it.
         menu.addItem(action("Quit Flipper", #selector(quit), key: "q"))
@@ -82,6 +104,10 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func toggleLogin() {
         Setup.setOpensAtLogin(!Setup.opensAtLogin)
+    }
+
+    @objc private func toggleAutomaticUpdates() {
+        updater?.updater.automaticallyChecksForUpdates.toggle()
     }
 
     @objc private func move() {

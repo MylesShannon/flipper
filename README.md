@@ -31,14 +31,16 @@ pick.
 - Reverse vertical and horizontal scrolling, each on or off.
 - Takes effect straight away, with no restart or log out.
 - Notarized by Apple, so it opens like any other app.
-- No network access, no analytics, no dependencies. About 400 lines of Swift.
+- Checks for updates and asks before installing anything. No analytics.
+- About 400 lines of Swift, plus Sparkle for updates.
 - Works on Apple silicon and Intel Macs running macOS 15 Sequoia or later,
   including macOS 26 Tahoe.
 
 ## Install
 
-Download the latest `Flipper-<version>.zip` from
-[Releases](https://github.com/MylesShannon/flipper/releases/latest), unzip it, and open `Flipper.app`.
+Download the latest `Flipper-<version>.dmg` from
+[Releases](https://github.com/MylesShannon/flipper/releases/latest), open it, and
+drag Flipper into Applications.
 
 Flipper sets itself up:
 
@@ -63,7 +65,13 @@ Click the arrows in the menu bar.
 - **Directions: Up and Down** and **Left and Right** pick which directions get
   reversed, for whichever devices are on.
 - **Open at Login** starts Flipper when you log in.
+- **Check for Updates…** looks for a new version now.
+- **Check for Updates Automatically** looks once a day and shortly after Flipper
+  opens. Flipper asks before installing anything.
 - **Quit Flipper** (`⌘Q`) stops it until you open it again or log in.
+
+Open at Login and the update items show once Flipper is in Applications. Until
+then, the menu offers **Move to Applications…**.
 
 It starts with Mouse, Up and Down, and Left and Right on, and Trackpad off. That's
 the usual fix: leave natural scrolling on for the trackpad and give the mouse wheel
@@ -77,6 +85,11 @@ event scrolls: a mouse wheel moves in whole lines, a trackpad smoothly in pixels
 For each event it flips, it negates the vertical and horizontal amounts in all
 three forms an event carries (lines, pixels and fixed point), since different apps
 read different ones.
+
+Updates come through [Sparkle](https://sparkle-project.org). Flipper reads the
+list of releases from this project's website, and when there's a newer version it
+shows what changed and asks before downloading it. Every update is signed, and
+Flipper checks the signature before installing it.
 
 ## FAQ
 
@@ -106,8 +119,8 @@ or high resolution wheels send smooth scrolls, and those count as a trackpad.
 
 Changing another app's input events is something macOS only allows for apps you've
 approved under Accessibility. Flipper only reads and rewrites scroll events. It
-doesn't look at keystrokes, clicks or anything else, and it never connects to the
-internet.
+doesn't look at keystrokes, clicks or anything else. It goes online only to check
+for updates, and it asks before installing one.
 
 ### What about remote desktop apps?
 
@@ -124,9 +137,12 @@ button remapping, so there's very little to trust or keep up to date.
 
 ### How do I uninstall Flipper?
 
-Quit it, switch it off in Open at Login, and drag it from Applications to the
-Trash. The release zip also has `uninstall.sh`, which does all of that and resets
-its Accessibility access. Add `--delete-settings` to remove its preferences too.
+Switch off **Open at Login** in its menu, quit it, and drag it from Applications
+to the Trash. Its preferences stay, so a reinstall picks up where you left off. To
+remove them too, run `defaults delete com.mylesshannon.flipper`.
+
+If you built it from source, `./uninstall.sh` does all of that and resets its
+Accessibility access. Add `--delete-settings` to remove its preferences too.
 
 ## License
 

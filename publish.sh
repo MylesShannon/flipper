@@ -7,6 +7,8 @@ trap 'echo "publish.sh stopped at line $LINENO. The output above says why." >&2'
 NOTES=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE"
+
+REPO=MylesShannon/flipper
 NOTARY_PROFILE=${NOTARY_PROFILE:-notary}
 
 [ -n "${FLIPPER_SIGN:-}" ] || { echo "Set FLIPPER_SIGN to the command that signs release builds. See docs/development.md." >&2; exit 1; }
@@ -16,7 +18,9 @@ gh auth status >/dev/null 2>&1 || { echo "Sign in to GitHub first: gh auth login
 
 VERSION=$(cat VERSION)
 TAG="v$VERSION"
-NAME="Flipper-$VERSION"
+DMG="$HERE/build/Flipper-$VERSION.dmg"
+UPDATE_NOTES="docs/release-notes/$VERSION.html"
+[ -f "$UPDATE_NOTES" ] || { echo "Write and commit $UPDATE_NOTES first. Sparkle's update dialog shows it." >&2; exit 1; }
 
 git fetch --quiet origin main
 [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || { echo "Push main first, so the release matches GitHub." >&2; exit 1; }
@@ -25,14 +29,20 @@ if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
   exit 1
 fi
 
+echo "Running the tests..."
+mkdir -p .build
+if ! swift test > .build/swift-test.log 2>&1; then
+  tail -n 30 .build/swift-test.log >&2
+  echo "The tests failed, so nothing was published." >&2
+  exit 1
+fi
+
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 ./build.sh
 
-APP="$work/$NAME/Flipper.app"
-mkdir "$work/$NAME"
-ditto "build/Flipper.app" "$APP"
+APP=build/Flipper.app
 if codesign -dv "$APP" 2>&1 | grep -q 'Signature=adhoc'; then
   echo "build/Flipper.app is signed ad hoc, which Apple won't notarize. Check FLIPPER_SIGN." >&2
   exit 1
@@ -51,17 +61,50 @@ out=$(xcrun notarytool submit "$work/notarize.zip" --keychain-profile "$NOTARY_P
 xcrun stapler staple -q "$APP"
 spctl --assess --type execute "$APP"
 
-cp install.sh uninstall.sh "$work/$NAME/"
-ZIP="$HERE/build/$NAME.zip"
-rm -f "$ZIP"
-(cd "$work" && ditto -c -k --keepParent "$NAME" "$ZIP")
+mkdir "$work/dmg" "$work/releases"
+ditto "$APP" "$work/dmg/Flipper.app"
+ln -s /Applications "$work/dmg/Applications"
+rm -f "$DMG"
+hdiutil create -quiet -volname "Flipper $VERSION" -srcfolder "$work/dmg" -format UDZO "$DMG"
 
-git tag -a "$TAG" -m "Flipper $VERSION"
-git push --quiet origin "$TAG"
-
-echo "Creating the $TAG release..."
-if ! gh release create "$TAG" "$ZIP" --verify-tag --title "Flipper $VERSION" --notes-file "$NOTES" --latest; then
-  echo "$TAG is pushed but the release wasn't made. Make it from that tag on GitHub and upload build/$NAME.zip." >&2
+# Sparkle won't install an update it can't verify, so the appcast gets this DMG's size and EdDSA signature, made with
+# the private key Sparkle's generate_keys put in your login Keychain. The HTML named after the DMG becomes the notes
+# in the update dialog.
+cp "$DMG" "$work/releases/"
+cp "$UPDATE_NOTES" "$work/releases/Flipper-$VERSION.html"
+echo "Signing the appcast..."
+SPARKLE=.build/artifacts/sparkle/Sparkle/bin
+# generate_keys may read the key it stored without asking, while generate_appcast would need a dialog, which SSH can't show.
+if ! "$SPARKLE/generate_keys" --account flipper -x "$work/sparkle-key" > .build/generate_keys.log 2>&1; then
+  tail -n 30 .build/generate_keys.log >&2
+  echo "Exporting the Sparkle key from your login Keychain failed, so nothing was published. Unlock the Keychain with: security unlock-keychain" >&2
   exit 1
 fi
+"$SPARKLE/generate_appcast" --ed-key-file "$work/sparkle-key" \
+  --download-url-prefix "https://github.com/$REPO/releases/download/$TAG/" -o docs/appcast.xml "$work/releases"
+rm -f "$work/sparkle-key"
+# The appcast lists every release, so the entry is found by file name.
+declared=$(sed -n "s|.*$(basename "$DMG")\" length=\"\([0-9]*\)\".*|\1|p" docs/appcast.xml)
+if [ "$declared" != "$(stat -f %z "$DMG")" ]; then
+  git checkout -- docs/appcast.xml
+  echo "The appcast doesn't describe $(basename "$DMG"), so nothing was published." >&2
+  exit 1
+fi
+
+git add docs/appcast.xml
+git commit --quiet -m "chore: appcast for $TAG"
+git tag -a "$TAG" -m "Flipper $VERSION"
+if ! git push --quiet --atomic origin main "refs/tags/$TAG"; then
+  echo "GitHub turned the push away, so main has the appcast commit and $TAG only here." >&2
+  echo "Push them with: git push --atomic origin main refs/tags/$TAG, then run: gh release create $TAG build/$(basename "$DMG") --repo $REPO --title \"Flipper $VERSION\" --notes-file <notes.md>" >&2
+  exit 1
+fi
+
+echo "Creating the $TAG release..."
+if ! gh release create "$TAG" "$DMG" --repo "$REPO" --title "Flipper $VERSION" --notes-file "$NOTES" --verify-tag --latest; then
+  echo "$TAG is pushed but the release wasn't made. Make it from that tag on GitHub and upload build/$(basename "$DMG")." >&2
+  exit 1
+fi
+
 echo "Published Flipper $VERSION."
+echo "Pages serves the new appcast within a few minutes, and then Sparkle offers the update."
