@@ -88,9 +88,13 @@ build has downloaded Sparkle, that's
 prints the public key for `SUPublicEDKey`. **Back it up.** Without it no future
 release can be signed, and installs already out there have no way to update.
 
-`publish.sh` exports the key with `generate_keys -x` into its temporary folder and
-passes it to `generate_appcast` with `--ed-key-file`, because over SSH
-`generate_appcast` can't show the dialog that asks for the keychain.
+`publish.sh` reads the key with `security find-generic-password` into its temporary
+folder and passes it to `generate_appcast` with `--ed-key-file`, because over SSH
+neither Sparkle tool can show the dialog that asks for the keychain. Once on each
+Mac that publishes, at its own Terminal, run
+`security find-generic-password -s https://sparkle-project.org -a flipper -w >/dev/null`,
+enter the login password and click **Always Allow**, so `security` can read the key
+without asking. Sparkle updates don't undo that.
 
 Release notes for the update dialog live in `docs/release-notes/<version>.html`:
 `<h2>Flipper <version></h2>`, a `<p>` with a one-line summary, then a `<ul>` with
