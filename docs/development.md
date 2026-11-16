@@ -81,6 +81,12 @@ until the user turns it off. Sparkle keeps that choice in Flipper's preferences.
 Flipper starts Sparkle only from Applications, and also checks quietly a few
 seconds after it opens.
 
+Flipper has no Dock icon, so Sparkle would open the update window it finds behind
+other apps. `UpdateAlerts`, Sparkle's user driver delegate, gives Flipper a Dock
+icon and brings it to the front while the window is open (`DockIcon`), and sets
+`supportsGentleScheduledUpdateReminders`, which Sparkle expects from apps without
+one.
+
 The private half of the key pair lives in the login keychain of the Mac that
 publishes, made once with Sparkle's `generate_keys --account flipper`. After a
 build has downloaded Sparkle, that's
