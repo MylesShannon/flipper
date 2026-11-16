@@ -8,11 +8,14 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private var waitForAccess: Timer?
     private var updater: SPUStandardUpdaterController?
+    private var appearance: NSKeyValueObservation?
+    private let glyph = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: "Flipper")!
     // As wide as the column macOS draws the checkmark in, so the column stays when nothing is checked.
     private static let blankCheck = NSImage(size: NSSize(width: 12, height: 1), flipped: false) { _ in true }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        item.button?.image = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: "Flipper")
+        item.button?.image = glyph
+        appearance = NSApp.observe(\.effectiveAppearance) { [weak self] _, _ in self?.refreshIcon() }
         let menu = NSMenu()
         menu.delegate = self
         item.menu = menu
@@ -105,7 +108,6 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let setting = sender.representedObject as? WritableKeyPath<FlipSettings, Bool> else { return }
         scrollTap.settings[keyPath: setting].toggle()
         scrollTap.settings.save(to: defaults)
-        refreshIcon()
     }
 
     @objc private func toggleLogin() {
@@ -129,6 +131,35 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func refreshIcon() {
-        item.button?.appearsDisabled = !(scrollTap.isRunning && scrollTap.settings.flipsAnything)
+        guard let button = item.button else { return }
+        if scrollTap.isRunning {
+            button.image = glyph
+            button.setAccessibilityLabel("Flipper")
+        } else {
+            button.image = Self.attentionIcon(glyph)
+            button.setAccessibilityLabel("Flipper, needs attention: Accessibility is off")
+        }
+    }
+
+    static func attentionIcon(_ glyph: NSImage) -> NSImage {
+        let side: CGFloat = 18, gap: CGFloat = 8, dot: CGFloat = 6
+        let image = NSImage(size: NSSize(width: side, height: side), flipped: true) { _ in
+            let s = glyph.size
+            let tinted = NSImage(size: s, flipped: false) { rect in
+                glyph.draw(in: rect)
+                NSColor.labelColor.set()
+                rect.fill(using: .sourceAtop)
+                return true
+            }
+            tinted.draw(in: NSRect(x: (side - s.width) / 2, y: (side - s.height) / 2, width: s.width, height: s.height))
+            NSGraphicsContext.current?.compositingOperation = .clear
+            NSBezierPath(ovalIn: NSRect(x: side - gap, y: 0, width: gap, height: gap)).fill()
+            NSGraphicsContext.current?.compositingOperation = .sourceOver
+            NSColor.systemRed.setFill()
+            NSBezierPath(ovalIn: NSRect(x: side - gap + (gap - dot) / 2, y: (gap - dot) / 2, width: dot, height: dot)).fill()
+            return true
+        }
+        image.isTemplate = false
+        return image
     }
 }

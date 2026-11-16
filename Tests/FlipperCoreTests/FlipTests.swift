@@ -11,7 +11,6 @@ final class FlipTests: XCTestCase {
         let s = FlipSettings()
         XCTAssertEqual(s.axes(for: .mouse), Axes(vertical: true, horizontal: true))
         XCTAssertEqual(s.axes(for: .trackpad), .none)
-        XCTAssertTrue(s.flipsAnything)
     }
 
     func testEachDeviceAndAxisIsSeparate() {
@@ -26,11 +25,11 @@ final class FlipTests: XCTestCase {
     func testFlipsNothingWithNoDeviceOrNoAxis() {
         var s = FlipSettings()
         s.mouse = false
-        XCTAssertFalse(s.flipsAnything)
+        XCTAssertEqual(s.axes(for: .mouse), .none)
+        XCTAssertEqual(s.axes(for: .trackpad), .none)
         s = FlipSettings()
         s.vertical = false
         s.horizontal = false
-        XCTAssertFalse(s.flipsAnything)
         XCTAssertEqual(s.axes(for: .mouse), .none)
     }
 

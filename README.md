@@ -51,8 +51,8 @@ Flipper sets itself up:
    Flipper on in System Settings, Privacy & Security, Accessibility. It starts
    working within a couple of seconds, with no restart.
 
-Until it has Accessibility, the menu bar icon is dimmed and the menu says
-**Needs Accessibility**.
+Until it has Accessibility, the menu bar icon has a red dot and the menu says
+**Needs Accessibility**, with **Open Accessibility Settings…** below it.
 
 To build it yourself instead, see [Development](docs/development.md).
 
