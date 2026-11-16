@@ -3,6 +3,20 @@
     <channel>
         <title>Flipper</title>
         <item>
+            <title>1.4.1</title>
+            <pubDate>Mon, 16 Nov 2026 16:50:48 -0500</pubDate>
+            <sparkle:version>1.4.1</sparkle:version>
+            <sparkle:shortVersionString>1.4.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h2>Flipper 1.4.1</h2>
+<p>A safer updater.</p>
+<ul>
+	<li>Flipper's updater, Sparkle, moves to version 2.10.1, which fixes security problems in how it installs updates. Nothing else changes.</li>
+</ul>
+]]></description>
+            <enclosure url="https://github.com/MylesShannon/flipper/releases/download/v1.4.1/Flipper-1.4.1.dmg" length="3314803" type="application/octet-stream" sparkle:edSignature="py4S6kg88D4JM4Drm4/aw53opp8ioQ/lfRaxFDQerQlGl2K5Fadc/9wjBi5Buo/+ubIt0nOsPwUYgkq/4awJBA=="/>
+        </item>
+        <item>
             <title>1.4</title>
             <pubDate>Mon, 16 Nov 2026 14:07:29 -0500</pubDate>
             <sparkle:version>1.4</sparkle:version>
