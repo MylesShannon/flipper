@@ -8,6 +8,7 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private var waitForAccess: Timer?
     private var updater: SPUStandardUpdaterController?
+    private var updateAlerts: UpdateAlerts?
     private var appearance: NSKeyValueObservation?
     private let glyph = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: "Flipper")!
     // As wide as the column macOS draws the checkmark in, so the column stays when nothing is checked.
@@ -22,7 +23,9 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !Setup.isInApplications && Setup.offerMove() { return }
         Setup.registerLoginItemOnce(defaults)
         if Setup.isInApplications {
-            let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+            let alerts = UpdateAlerts()
+            let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: alerts)
+            updateAlerts = alerts
             self.updater = updater
             // Sparkle's daily schedule counts from its last check, so a copy that was closed for a while would wait
             // another day. Nothing appears unless there's a newer version.
