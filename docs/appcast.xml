@@ -2,5 +2,24 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>Flipper</title>
+        <item>
+            <title>1.4</title>
+            <pubDate>Mon, 16 Nov 2026 14:07:29 -0500</pubDate>
+            <sparkle:version>1.4</sparkle:version>
+            <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h2>Flipper 1.4</h2>
+<p>Updates from inside the app, a disk image to download, and Intel Macs.</p>
+<ul>
+	<li>This is the last version you download by hand. To update from 1.3, quit Flipper, open the DMG and drag Flipper into Applications, replacing the old copy. From now on, updates come through the app.</li>
+	<li>Flipper checks for updates once a day and shortly after it opens, and asks before installing anything. <strong>Check for Updates…</strong> looks now, and <strong>Check for Updates Automatically</strong> turns the checking off. Checking for updates is the only time Flipper goes online. Both items show once Flipper is in Applications.</li>
+	<li>Flipper runs on Intel Macs too. Earlier versions ran only on Apple silicon.</li>
+	<li>Flipper needs macOS 15 or later.</li>
+	<li>While Flipper needs Accessibility, its menu bar icon gets a red dot instead of dimming, so you can still tell which app it is. The icon still dims with every switch off, since Flipper isn't changing anything then.</li>
+	<li>Opening Flipper again while it runs, from Applications or Spotlight, opens its menu. Before, nothing happened.</li>
+</ul>
+]]></description>
+            <enclosure url="https://github.com/MylesShannon/flipper/releases/download/v1.4/Flipper-1.4.dmg" length="3325539" type="application/octet-stream" sparkle:edSignature="H85BUkN3shRBpVbHCY04gx8b8GKFrRVMDc+B/ZB0MaqMOtbKzWzFLd7O6cpHDxxQfPkPtzmaK3+4fmQpOOHmAg=="/>
+        </item>
     </channel>
 </rss>
