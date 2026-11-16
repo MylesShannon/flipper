@@ -108,6 +108,7 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let setting = sender.representedObject as? WritableKeyPath<FlipSettings, Bool> else { return }
         scrollTap.settings[keyPath: setting].toggle()
         scrollTap.settings.save(to: defaults)
+        refreshIcon()
     }
 
     @objc private func toggleLogin() {
@@ -134,8 +135,10 @@ final class MenuBar: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let button = item.button else { return }
         if scrollTap.isRunning {
             button.image = glyph
+            button.appearsDisabled = !scrollTap.settings.flipsAnything
             button.setAccessibilityLabel("Flipper")
         } else {
+            button.appearsDisabled = false
             button.image = Self.attentionIcon(glyph)
             button.setAccessibilityLabel("Flipper, needs attention: Accessibility is off")
         }

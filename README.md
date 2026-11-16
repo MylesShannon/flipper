@@ -52,7 +52,8 @@ Flipper sets itself up:
    working within a couple of seconds, with no restart.
 
 Until it has Accessibility, the menu bar icon has a red dot and the menu says
-**Needs Accessibility**, with **Open Accessibility Settings…** below it.
+**Needs Accessibility**, with **Open Accessibility Settings…** below it. With
+every switch off, the icon is dimmed, since Flipper isn't changing anything.
 
 To build it yourself instead, see [Development](docs/development.md).
 

@@ -49,6 +49,10 @@ public struct FlipSettings: Equatable {
         return on ? Axes(vertical: vertical, horizontal: horizontal) : .none
     }
 
+    public var flipsAnything: Bool {
+        (mouse || trackpad) && (vertical || horizontal)
+    }
+
     enum Key {
         static let mouse = "flipMouse"
         static let trackpad = "flipTrackpad"
